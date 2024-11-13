@@ -20,3 +20,7 @@ export function formatSingleView(idViews: number) {
     return idViews + " views";
   }
 }
+
+export function parseServerActionResponse<T>(response: T) {
+  return JSON.parse(JSON.stringify(response));
+}

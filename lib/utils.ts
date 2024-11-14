@@ -15,12 +15,14 @@ export function formatDate(date: string) {
 
 export function formatSingleView(idViews: number) {
   if (idViews === 1) {
-    return idViews + " view";
-  } else {
+    return idViews + " view"
+  } else if (idViews > 1) {
     return idViews + " views";
+  } else {
+    return "No views";
   }
 }
 
-export function parseServerActionResponse<T>(response: T) {
+export function parseServerActionResp<T>(response: T) {
   return JSON.parse(JSON.stringify(response));
 }

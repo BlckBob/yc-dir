@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { parseServerActionResponse } from "@/lib/utils";
+import { parseServerActionResp } from "@/lib/utils";
 import slugify from "slugify";
 import { writeClient } from "@/sanity/lib/write-client";
 
@@ -13,7 +13,7 @@ export const createPitch = async (
   const session = await auth();
 
   if (!session)
-    return parseServerActionResponse({
+    return parseServerActionResp({
       error: "Not signed in",
       status: "ERROR",
     });
@@ -43,7 +43,7 @@ export const createPitch = async (
 
     const result = await writeClient.create({ _type: "startup", ...startup });
 
-    return parseServerActionResponse({
+    return parseServerActionResp({
       ...result,
       error: "",
       status: "SUCCESS",
@@ -51,7 +51,7 @@ export const createPitch = async (
   } catch (error) {
     console.log(error);
 
-    return parseServerActionResponse({
+    return parseServerActionResp({
       error: JSON.stringify(error),
       status: "ERROR",
     });

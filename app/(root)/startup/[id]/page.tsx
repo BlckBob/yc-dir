@@ -1,17 +1,15 @@
 import { Suspense } from "react";
 import { client } from "@/sanity/lib/client";
 import {
-  // PLAYLIST_BY_SLUG_QUERY,
+  PLAYLIST_BY_SLUG_QUERY,
   STARTUP_BY_ID_QUERY,
 } from "@/sanity/lib/queries";
 import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
-
 import markdownit from "markdown-it";
-
-// import StartupCard, { StartupTypeCard } from "@/components/StartupCard";
+import StartupCard, { StartupTypeCard } from "@/components/StartupCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import View from "@/components/View";
 
@@ -20,14 +18,16 @@ const md = markdownit();
 export const experimental_ppr = true;
 
 const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
-  const id = (await params).id;
+  const { id } = await params;
 
-  const post = await client.fetch(STARTUP_BY_ID_QUERY, { id });
+  const [post, { select: editorPosts }] = await Promise.all([
+    client.fetch(STARTUP_BY_ID_QUERY, { id }),
+    client.fetch(PLAYLIST_BY_SLUG_QUERY, { slug: "editor-picks" }),
+  ]);
+
   if (!post) return notFound();
 
   const parsedContent = md.render(post?.pitch || "");
-
-  if (!post) return notFound();
 
   return (
     <>
@@ -82,7 +82,18 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
         </div>
 
         <hr className="divider" />
-        {/* TODO: Editor se3lected startups */}
+
+        {editorPosts?.length > 0 && (
+          <div className="mx-auto max-w-4xl">
+            <p className="text-30-semibold">Editor's Picks</p>
+
+            <ul className="card_grid-sm mt-7">
+              {editorPosts.map((post: StartupTypeCard, idx: number) => (
+                <StartupCard key={idx} post={post} />
+              ))}
+            </ul>
+          </div>
+        )}
 
         <Suspense fallback={<Skeleton className="view_skeleton" />}>
           <View id={id} />
